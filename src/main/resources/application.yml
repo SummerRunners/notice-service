@@ -1,0 +1,18 @@
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: srunners.owner@gmail.com
+    password: ufvgzmkvmwtrhwpr
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          debug: true
+
+logging:
+  level:
+    org.springframework.mail: DEBUG

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Email</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    /* 백그라운드 이미지와 컨테이너 */
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    /* 배경 커버 처리 */
+    .image-background {
+      background: url('https://picsum.photos/600/400') center center / cover no-repeat;
+      text-align: center;
+      padding: 80px 20px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    /* 반투명 오버레이 */
+    .image-background::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4); /* 반투명 검정 오버레이 */
+      z-index: 0;
+    }
+
+    .image-background h1 {
+      position: relative;
+      z-index: 1; /* 텍스트를 오버레이 위에 위치 */
+    }
+
+    .content {
+      background-color: #ffffff;
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .content p {
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+
+    .button {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffffff;
+      background: linear-gradient(90deg, #007bff 0%, #00d4ff 100%);
+      padding: 12px 25px;
+      border-radius: 25px;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
+      transition: background 0.3s;
+      margin-top: 20px;
+    }
+
+    .button:hover {
+      background: linear-gradient(90deg, #0056b3 0%, #0095d9 100%);
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.8);
+    }
+
+    .footer {
+      background-color: #f5f5f5;
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* 애니메이션 효과 */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- 이메일 전체 -->
+<div class="container">
+  <!-- 배경 이미지 섹션 -->
+  <div class="image-background">
+    <h1 th:text="${subject}">안녕하세요, 사용자님!</h1>
+  </div>
+
+  <!-- 메인 콘텐츠 섹션 -->
+  <div class="content">
+    <p th:text="'안녕하세요. ' + ${email} + ' 님!'">안녕하세요 사용자님!</p>
+    <p>우리의 서비스를 선택해 주셔서 감사합니다.</p>
+    <p>아래 버튼을 눌러 서비스를 시작하세요.</p>
+    <p th:utext="${content}">이곳에 콘텐츠가 들어갑니다.</p>
+    <a href="http://srunners.xyz/" class="button">지금 시작하기</a>
+  </div>
+
+  <!-- 푸터 섹션 -->
+  <div class="footer">
+    <p>&copy; 2025 SummerRunners. All rights reserved.</p>
+    <p>문의: <a href="mailto:srunners.owner@gmail.com">srunners.owner@gmail.com</a></p>
+  </div>
+</div>
+</body>
+</html>
