@@ -1,6 +1,5 @@
 package xyz.srunners.notice.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,8 @@ class MailServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        emailList = Arrays.asList("lyaesley@gmail.com", "lgm3555@gmail.com", "eo72728836@gmail.com", "dmsk.ess@gmail.com", "ghdrms1992biz@gmail.com");
+//        emailList = Arrays.asList("lyaesley@gmail.com", "lgm3555@gmail.com", "eo72728836@gmail.com", "dmsk.ess@gmail.com", "ghdrms1992biz@gmail.com");
+        emailList = List.of("lyaesley@gmail.com");
     }
 
     @Test
