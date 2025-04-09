@@ -31,7 +31,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Gradle 의존성 캐싱
+      # 3. Gradle Wrapper에 실행 권한 추가
+      - name: Grant execute permission to Gradle Wrapper
+        run: chmod +x ./gradlew
+
+      # 4. Gradle 의존성 캐싱
       - name: Cache Gradle Dependencies
         uses: actions/cache@v3
         with:
@@ -40,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 4. Gradle 빌드 수행
+      # 5. Gradle 빌드 수행
       - name: Build using Gradle
         run: ./gradlew clean build -x test # 테스트 제외하고 빌드
 
@@ -57,6 +61,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      # Gradle Wrapper에 실행 권한 추가
+      - name: Grant execute permission to Gradle Wrapper
+        run: chmod +x ./gradlew
 
       - name: Run Tests
         run: ./gradlew test # Gradle 테스트 실행
