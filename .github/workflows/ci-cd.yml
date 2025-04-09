@@ -24,7 +24,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # 2. GitHub Packages에 로그인
+      # 2. Gradle 빌드 수행
+      - name: Build Java Application
+        run: ./gradlew clean build -x test # 테스트 제외하고 빌드 수행
+
+      # 3. GitHub Packages에 로그인
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -32,16 +36,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3. Docker 메타데이터 추출 (태그와 라벨 설정)
+      # 4. Docker 메타데이터 추출 (태그와 라벨 설정)
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # 4. Docker 이미지 빌드 및 GitHub Packages로 푸시
+      # 5. Docker 이미지 빌드 및 GitHub Packages로 푸시
       - name: Build and Push Docker Image
-        id: push
         uses: docker/build-push-action@v5
         with:
           context: .
