@@ -1,0 +1,29 @@
+services:
+  app:
+    image: ghcr.io/lyaesley/notice-service:main # CI/CD에서 생성된 Docker 이미지 사용
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo  # MongoDB가 먼저 실행되도록 설정
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=notice
+      - SPRING_DATA_MONGODB_USERNAME=srunners  # 초기화된 사용자 계정
+      - SPRING_DATA_MONGODB_PASSWORD=srunners  # 초기화된 사용자 비밀번호
+
+  mongo:
+    build:
+      context: .
+      dockerfile: MongoDB.Dockerfile # 커스텀 MongoDB Dockerfile 사용
+    container_name: mongodb
+    ports:
+      - "27017:27017" # 외부에서 접근하려면 열어둠
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "admin"   # 초기 루트 사용자
+      MONGO_INITDB_ROOT_PASSWORD: "admin"   # 초기 루트 비밀번호
+    volumes:
+      - mongo_data:/data/db  # MongoDB 데이터 영구 저장
+
+volumes:
+  mongo_data:
