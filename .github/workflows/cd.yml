@@ -8,6 +8,10 @@ on:
     types:
       - completed
 
+# 환경 변수 정의
+env:
+  REGISTRY: ghcr.io
+
 jobs:
   deploy-to-gcp:
     runs-on: ubuntu-22.04
@@ -15,7 +19,15 @@ jobs:
       contents: read
 
     steps:
-      # Step 1: GCP VM에 SSH 연결 및 Docker 이미지 배포
+      # Step 1: 소문자 변환된 이미지 이름 설정
+      - name: Set Lowercase Image Name
+        run: |
+          echo "IMAGE_NAME=${OWNER,,}/${REPO,,}" >> ${GITHUB_ENV}
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+
+      # Step 2: GCP VM에 SSH 연결 및 Docker 이미지 배포
       - name: Deploy to GCP VM
         uses: appleboy/ssh-action@master
         with:
@@ -27,5 +39,5 @@ jobs:
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker stop notice-service || true
             docker rm notice-service || true
-            docker pull ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
-            docker run -d --name notice-service -p 80:8080 ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker run -d --name notice-service -p 80:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
