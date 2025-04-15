@@ -13,7 +13,7 @@ on:
 # 환경 변수 정의
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository | toLowerCase }}  # 이미지 이름을 소문자로 변환
 
 # Job 정의
 jobs:
@@ -89,5 +89,5 @@ jobs:
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker stop notice-service || true
             docker rm notice-service || true
-            docker pull ghcr.io/${{ github.repository }}:latest
-            docker run -d --name notice-service -p 8080:8080 ghcr.io/${{ github.repository }}:latest
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker run -d --name notice-service -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
