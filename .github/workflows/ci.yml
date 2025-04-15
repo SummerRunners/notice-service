@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-      packages: write   # ghcr.io에 푸시하기 위한 권한
+      packages: write
 
     steps:
       # Step 1: 코드 체크아웃
