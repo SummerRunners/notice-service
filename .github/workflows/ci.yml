@@ -45,7 +45,10 @@ jobs:
       # Step 4: 리포지토리 이름을 소문자로 변환하여 환경 변수로 설정
       - name: Set Lowercase Image Name
         run: |
-          echo "IMAGE_NAME=${{ github.repository_owner,, }}/${{ github.event.repository.name,, }}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=${OWNER,,}/${REPO,,}" >> ${GITHUB_ENV}
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
 
       # Step 5: Gradle 빌드 수행을 위한 권한 설정
       - name: Grant Execute Permission to Gradle Wrapper
