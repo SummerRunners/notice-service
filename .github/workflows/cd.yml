@@ -7,6 +7,7 @@ on:
       - CI - Build and Push Docker Image # CI 단계가 성공적으로 완료되어야 실행
     types:
       - completed
+  workflow_dispatch:
 
 # 환경 변수 정의
 env:
