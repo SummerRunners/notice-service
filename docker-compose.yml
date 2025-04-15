@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/lyaesley/notice-service:main # CI/CD에서 생성된 Docker 이미지 사용
+    image: ghcr.io/srunners/notice-service:latest # CI/CD에서 생성된 Docker 이미지 사용
     ports:
       - "8080:8080"
     depends_on:
