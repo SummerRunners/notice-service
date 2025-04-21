@@ -1,7 +1,9 @@
+server:
+  port: 8081
 spring:
   data:
     mongodb:
-      host: mongodb-container
+      host: mongodb-service
       port: 27017
       database: notice
       username: srunners

@@ -42,4 +42,4 @@ jobs:
             docker stop notice-service || true
             docker rm notice-service || true
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            docker run -d --name notice-service --network srunners-network -p 80:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker run -d --name notice-service --network srunners-network -p 8081:8081 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
