@@ -2,42 +2,47 @@ package xyz.srunners.notice.email.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import java.util.HashMap;
-import java.util.Map;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.Getter;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class EmailDto {
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Getter
     @Builder
-    public static class EmailRequestDto {
-        // 단일 수신자 이메일
+    public static class SingleEmailRequest {
         @Email
         @NotBlank
-        private String to;  // 받는 사람 이메일
-
-        // 다수의 수신자 이메일 (Bulk 용도)
-        private List<@Email @NotBlank String> toList; // 여러 수신자 이메일
+        private final String to;
 
         @NotBlank
-        private String subject; // 이메일 제목
+        private final String subject;
 
         @NotBlank
-        private String content; // 이메일 내용
+        private final String content;
 
-        public static Map<String, Object> convertToMap(EmailRequestDto request) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("email", request.getTo());
-            map.put("subject", request.getSubject());
-            map.put("content", request.getContent());
-            return map;
+        public Map<String, Object> toTemplateVariables() {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("email", to);
+            variables.put("subject", subject);
+            variables.put("content", content);
+            return variables;
         }
+    }
+
+    @Getter
+    @Builder
+    public static class BulkEmailRequest {
+        @NotEmpty
+        private final List<@Email @NotBlank String> recipients;
+
+        @NotBlank
+        private final String subject;
+
+        @NotBlank
+        private final String content;
     }
 }

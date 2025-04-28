@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="~{fragments/head :: headFragment}"></head>
+<body>
+<!-- 네비게이션 바 -->
+<nav th:replace="~{fragments/gnb :: gnbFragment}"></nav>
+
+<!-- 메인 콘텐츠 -->
+<main>
+  <div layout:fragment="content"></div>
+</main>
+
+<!-- 푸터 -->
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
+
+<!-- 알림 영역 -->
+<div class="page-notification" id="notification-container"></div>
+
+<!-- 공통 스크립트 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 알림 기능 초기화
+    window.showGlobalNotification = function (type, message, duration = 5000) {
+      const container = document.getElementById('notification-container');
+
+      // 새 알림 생성
+      const notification = document.createElement('div');
+      notification.className = 'alert alert-' + type + ' alert-dismissible fade show';
+      notification.innerHTML = `
+                                ${message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            `;
+
+      // 알림 추가
+      container.appendChild(notification);
+
+      // 지정된 시간 후 자동으로 닫기
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, duration);
+    };
+
+    // 페이지 로딩 완료 시 알림
+    const path = window.location.pathname;
+    if (path.includes('/mail/logs')) {
+      // 필요시 로그 페이지 특정 초기화 코드
+    } else if (path.includes('/mail/compose')) {
+      // 필요시 메일 작성 페이지 특정 초기화 코드
+    }
+  });
+</script>
+
+<!-- 페이지별 스크립트 -->
+<th:block layout:fragment="script"></th:block>
+</body>

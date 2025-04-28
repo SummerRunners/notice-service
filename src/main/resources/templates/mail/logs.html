@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}"
+      layout:fragment="content">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 발송 로그</title>
+    <style>
+        .email-logs {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+            font-weight: 600;
+        }
+        .bulk-card .card-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+        .single-card .card-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        .status-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-failed {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-requested {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .time-badge {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 0.75em;
+        }
+        .pagination-container {
+            position: sticky;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 10px 0;
+            margin-top: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid #eee;
+            z-index: 1000;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination li a {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .pagination li a:hover {
+            background-color: #f8f9fa;
+        }
+        .pagination li.active a {
+            background-color: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+        .pagination li.disabled a {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        .stats-box {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .stats-number {
+            font-size: 2em;
+            font-weight: 700;
+        }
+        .stats-label {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 0;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 email-logs">
+        <h1 class="mb-4">이메일 발송 로그</h1>
+        
+        <!-- 통계 -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <div class="stats-number" th:text="${bulkLogs.size()}">0</div>
+                    <div class="stats-label">대량 이메일 작업</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <div class="stats-number" th:text="${allLogs.totalElements}">0</div>
+                    <div class="stats-label">전체 이메일 수</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-box">
+                    <div class="stats-number"
+                         th:text="${#lists.size(allLogs.content.?[status.name == 'SUCCESS'])}">0</div>
+                    <div class="stats-label">성공한 이메일</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 대량 이메일 작업 목록 -->
+        <h2 class="mb-3">대량 이메일 작업</h2>
+        <div class="row" th:if="${!bulkLogs.isEmpty()}">
+            <div class="col-md-6" th:each="log : ${bulkLogs}">
+                <div class="card bulk-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span th:text="${log.subject}">메일 제목</span>
+                        <span class="status-badge" 
+                              th:classappend="${log.status.name() == 'SUCCESS' ? 'status-success' : 
+                                              (log.status.name() == 'FAILED' ? 'status-failed' : 'status-requested')}"
+                              th:text="${log.status.name()}">상태</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>작업 ID:</strong> 
+                            <span th:text="${log.jobId}">Job ID</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>수신자 수:</strong> 
+                            <span th:text="${log.metadata.get('recipientCount')}">0</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>성공:</strong> 
+                            <span th:text="${log.metadata.get('successCount')}">0</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>실패:</strong> 
+                            <span th:text="${log.metadata.get('failCount')}">0</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>요청 시간:</strong> 
+                            <span class="time-badge" 
+                                  th:text="${#temporals.format(log.requestedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                  Time
+                            </span>
+                        </div>
+                        <a th:href="@{/mail/{id}(id=${log.id})}" class="btn btn-primary btn-sm">상세 보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${bulkLogs.isEmpty()}">
+            <i class="fas fa-inbox"></i>
+            <p>대량 이메일 작업이 없습니다.</p>
+        </div>
+        
+        <!-- 전체 이메일 로그 -->
+        <h2 class="mt-5 mb-3">모든 이메일 로그</h2>
+        <div class="row" th:if="${!allLogs.isEmpty()}">
+            <div class="col-md-6" th:each="log : ${allLogs}">
+                <div class="card single-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span th:text="${log.subject}">메일 제목</span>
+                        <span class="status-badge" 
+                              th:classappend="${log.status.name() == 'SUCCESS' ? 'status-success' : 
+                                              (log.status.name() == 'FAILED' ? 'status-failed' : 'status-requested')}"
+                              th:text="${log.status.name()}">상태</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2" th:if="${log.recipient != null}">
+                            <strong>수신자:</strong> 
+                            <span th:text="${log.recipient}">recipient@email.com</span>
+                        </div>
+                        <div class="mb-2" th:if="${log.isBulk}">
+                            <strong>작업 유형:</strong> 
+                            <span class="badge bg-info">대량 메일</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>요청 시간:</strong> 
+                            <span class="time-badge" 
+                                  th:text="${#temporals.format(log.requestedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                  Time
+                            </span>
+                        </div>
+                        <a th:href="@{/mail/{id}(id=${log.id})}" class="btn btn-primary btn-sm">상세 보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${allLogs.isEmpty()}">
+            <i class="fas fa-envelope-open"></i>
+            <p>이메일 로그가 없습니다.</p>
+        </div>
+        
+        <!-- 페이지네이션 -->
+        <div class="pagination-container" th:if="${allLogs.totalPages > 1}">
+            <ul class="pagination">
+                <li th:class="${currentPage == 0 ? 'disabled' : ''}">
+                    <a th:href="@{/mail/logs(page=0)}">처음</a>
+                </li>
+                <li th:class="${currentPage == 0 ? 'disabled' : ''}">
+                    <a th:href="@{/mail/logs(page=${currentPage - 1})}">이전</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, allLogs.totalPages - 1)}" 
+                    th:class="${i == currentPage ? 'active' : ''}">
+                    <a th:href="@{/mail/logs(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <li th:class="${currentPage + 1 == allLogs.totalPages ? 'disabled' : ''}">
+                    <a th:href="@{/mail/logs(page=${currentPage + 1})}">다음</a>
+                </li>
+                <li th:class="${currentPage + 1 == allLogs.totalPages ? 'disabled' : ''}">
+                    <a th:href="@{/mail/logs(page=${allLogs.totalPages - 1})}">마지막</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

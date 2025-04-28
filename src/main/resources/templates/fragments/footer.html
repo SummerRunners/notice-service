@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<footer th:fragment="footerFragment" class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4 mb-md-0">
+        <h5 class="mb-3">이메일 서비스</h5>
+        <p class="mb-3">SummerRunners 메일 발송 및 관리 시스템</p>
+        <div class="d-flex">
+          <a href="#" class="me-3 footer-icon">
+            <i class="fab fa-github"></i>
+          </a>
+          <a href="#" class="me-3 footer-icon">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="footer-icon">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4 mb-md-0">
+        <h5 class="mb-3">바로가기</h5>
+        <ul class="list-unstyled footer-links">
+          <li>
+            <a href="/mail/compose">
+              <i class="fas fa-chevron-right me-2"></i>메일 작성
+            </a>
+          </li>
+          <li>
+            <a href="/mail/logs">
+              <i class="fas fa-chevron-right me-2"></i>발송 로그
+            </a>
+          </li>
+          <li>
+            <a href="#도움말">
+              <i class="fas fa-chevron-right me-2"></i>도움말
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h5 class="mb-3">문의</h5>
+        <p>
+          <i class="fas fa-envelope me-2"></i>srunners.owner@gmail.com
+        </p>
+        <p>
+          <i class="fas fa-phone-alt me-2"></i>02-123-4567
+        </p>
+        <p>
+          <i class="fas fa-map-marker-alt me-2"></i>서울특별시
+        </p>
+      </div>
+    </div>
+    <hr class="mt-4 mb-4" style="border-color: rgba(255,255,255,0.1);">
+    <div class="text-center">
+      <p class="mb-0">&copy; 2025 SummerRunners. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default}"
+      layout:fragment="content">
+<head>
+    <title>이메일 로그 상세</title>
+    <style>
+        .log-detail {
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+        }
+        .detail-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .status-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-failed {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-requested {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .detail-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .detail-section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2575fc;
+        }
+        .detail-label {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        .time-badge {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 0.75em;
+        }
+        .metadata-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .related-log-card {
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+        .related-log-card:hover {
+            transform: translateY(-3px);
+        }
+        .email-content {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+        .error-message {
+            background-color: #fff3f3;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin-top: 10px;
+            color: #dc3545;
+        }
+        .timing-info {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .timing-item {
+            flex: 1;
+            min-width: 200px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px;
+            text-align: center;
+        }
+        .timing-value {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #2575fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5 log-detail">
+        <div class="detail-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>
+                    <span th:text="${mailLog.isBulk ? '대량 이메일 작업' : '이메일 로그'}"></span>
+                    <span class="status-badge" 
+                         th:classappend="${mailLog.status.name() == 'SUCCESS' ? 'status-success' : 
+                                        (mailLog.status.name() == 'FAILED' ? 'status-failed' : 'status-requested')}"
+                         th:text="${mailLog.status.name()}">상태</span>
+                </h1>
+                <a th:href="@{/mail/logs}" class="btn btn-light">목록으로</a>
+            </div>
+            <p class="mt-2 mb-0" th:text="${mailLog.subject}">이메일 제목</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <!-- 기본 정보 -->
+                <div class="detail-card">
+                    <div class="detail-section">
+                        <h2 class="section-title">기본 정보</h2>
+                        <div class="row mb-2" th:if="${mailLog.recipient != null}">
+                            <div class="col-md-3 detail-label">수신자</div>
+                            <div class="col-md-9" th:text="${mailLog.recipient}">recipient@email.com</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3 detail-label">작업 ID</div>
+                            <div class="col-md-9" th:text="${mailLog.jobId ?: '(독립 작업)'}">Job ID</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3 detail-label">유형</div>
+                            <div class="col-md-9">
+                                <span th:text="${mailLog.isBulk ? '대량 이메일' : '단일 이메일'}"></span>
+                                <span th:if="${mailLog.isHtml}">(HTML)</span>
+                                <span th:unless="${mailLog.isHtml}">(텍스트)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 시간 정보 -->
+                    <div class="detail-section">
+                        <h2 class="section-title">시간 정보</h2>
+                        <div class="timing-info">
+                            <div class="timing-item">
+                                <div class="timing-label">요청 시간</div>
+                                <div class="timing-value" th:text="${#temporals.format(mailLog.requestedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                    0000-00-00 00:00:00
+                                </div>
+                            </div>
+                            <div class="timing-item" th:if="${mailLog.completedAt != null}">
+                                <div class="timing-label">완료 시간</div>
+                                <div class="timing-value" th:text="${#temporals.format(mailLog.completedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                    0000-00-00 00:00:00
+                                </div>
+                            </div>
+                            <div class="timing-item" th:if="${executionTime != null}">
+                                <div class="timing-label">실행 시간</div>
+                                <div class="timing-value" th:text="${executionTime}">0초</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 이메일 내용 -->
+                    <div class="detail-section">
+                        <h2 class="section-title">이메일 내용</h2>
+                        <div th:if="${mailLog.isHtml}">
+                            <iframe th:srcdoc="${mailLog.content}" width="100%" height="300" style="border:none;"></iframe>
+                        </div>
+                        <div th:unless="${mailLog.isHtml}" class="email-content" th:text="${mailLog.content}">
+                            이메일 내용
+                        </div>
+                    </div>
+                    
+                    <!-- 오류 정보 -->
+                    <div class="detail-section" th:if="${mailLog.errorMessage != null}">
+                        <h2 class="section-title">오류 정보</h2>
+                        <div class="error-message" th:text="${mailLog.errorMessage}">
+                            오류 메시지
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- 메타데이터 -->
+                <div class="detail-card">
+                    <div class="detail-section">
+                        <h2 class="section-title">메타데이터</h2>
+                        <div th:if="${mailLog.metadata != null && !mailLog.metadata.isEmpty()}">
+                            <div class="metadata-item" th:each="entry : ${mailLog.metadata}">
+                                <div class="fw-bold" th:text="${entry.key}">키</div>
+                                <div th:text="${entry.value}">값</div>
+                            </div>
+                        </div>
+                        <div th:if="${mailLog.metadata == null || mailLog.metadata.isEmpty()}" class="text-muted">
+                            메타데이터가 없습니다.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 관련 로그 -->
+                <div class="detail-card" th:if="${relatedLogs != null && !relatedLogs.isEmpty()}">
+                    <div class="detail-section">
+                        <h2 class="section-title">관련 이메일 로그</h2>
+                        <div class="related-log-card" th:each="log : ${relatedLogs}">
+                            <div class="d-flex justify-content-between">
+                                <div th:if="${log.recipient != null}" th:text="${log.recipient}">
+                                    recipient@email.com
+                                </div>
+                                <span class="status-badge" 
+                                     th:classappend="${log.status.name() == 'SUCCESS' ? 'status-success' : 
+                                                     (log.status.name() == 'FAILED' ? 'status-failed' : 'status-requested')}"
+                                     th:text="${log.status.name()}">상태</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="time-badge" 
+                                      th:text="${#temporals.format(log.requestedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                                      Time
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                <a th:href="@{/mail/{id}(id=${log.id})}" class="btn btn-sm btn-outline-primary">
+                                    상세 보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.4'
+    id 'org.springframework.boot' version '3.3.3'  // 3.4.4에서 3.3.3으로 변경
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -18,27 +18,31 @@ repositories {
 }
 
 dependencies {
+    // 스프링 부트 기본 의존성
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // Lombok 설정
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
+    // 개발 도구
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // 테스트 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-// 테스트 코드를 제외한 빌드 수행
-//tasks.withType(Test) {
-//    enabled = false
-//}
