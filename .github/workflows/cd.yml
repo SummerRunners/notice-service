@@ -40,5 +40,4 @@ jobs:
 
           script: |
             cd ${{ secrets.NOTICE_WORK_DIR}}
-            docker stop notice-service || true
             docker-compose down && docker-compose -d --build
