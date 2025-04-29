@@ -28,18 +28,18 @@ jobs:
         env:
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
-          WORKDIR: ${{ secrets.NOTICE_WORK_DIR}}
 
       # Step 2: GCP VM에 SSH 연결 및 Docker 이미지 배포
       - name: Deploy to GCP VM
+        env:
+          WORKDIR: ${{ secrets.NOTICE_WORK_DIR}}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.GCP_SSH_PASSPHRASE }}
-          script_path: ${{ secrets.NOTICE_WORK_DIR}}
           script: |
-            cd ${{ secrets.NOTICE_WORK_DIR}}
+            cd ${WORKDIR,,}
             pwd
             docker-compose down && docker-compose -d --build
