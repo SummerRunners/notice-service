@@ -40,4 +40,6 @@ jobs:
           passphrase: ${{ secrets.GCP_SSH_PASSPHRASE }}
           script_path: ${{ secrets.NOTICE_WORK_DIR}}
           script: |
+            cd ${{ secrets.NOTICE_WORK_DIR}}
+            pwd
             docker-compose down && docker-compose -d --build
