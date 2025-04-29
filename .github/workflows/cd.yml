@@ -37,9 +37,8 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.GCP_SSH_PASSPHRASE }}
+
           script: |
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            cd ${{ secrets.NOTICE_WORK_DIR}}
             docker stop notice-service || true
-            docker rm notice-service || true
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            docker run -d --name notice-service --network srunners-network -p 8081:8081 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker-compose down && docker-compose -d --build
