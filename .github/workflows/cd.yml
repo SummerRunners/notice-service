@@ -31,8 +31,6 @@ jobs:
 
       # Step 2: GCP VM에 SSH 연결 및 Docker 이미지 배포
       - name: Deploy to GCP VM
-        env:
-          WORKDIR: ${{ secrets.NOTICE_WORK_DIR}}
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_HOST }}
@@ -40,6 +38,6 @@ jobs:
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.GCP_SSH_PASSPHRASE }}
           script: |
-            cd ${WORKDIR,,}
+            cd /home/srunners/srunners-docker-config/src/xyz/srunners/docker/notice
             pwd
             docker-compose down && docker-compose -d --build
