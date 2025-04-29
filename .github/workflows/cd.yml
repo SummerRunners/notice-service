@@ -40,4 +40,4 @@ jobs:
           script: |
             cd /home/srunners/srunners-docker-config/src/xyz/srunners/docker/notice
             pwd
-            docker-compose down && docker-compose -d --build
+            docker-compose down && docker-compose up -d --build
